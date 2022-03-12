@@ -11,6 +11,34 @@ const Company = struct {
     corporate_tax: []const u8,
 };
 
+fn csv_line_create_company(line: []const u8) Company {
+    var row_columns = std.mem.split(u8, line, ";");
+    const csv = row_columns.next() orelse "";
+    const name = row_columns.next() orelse "";
+    const se = row_columns.next() orelse "";
+    const income_year = row_columns.next() orelse "";
+    _ = row_columns.next(); // Skip 5
+    const company_type = row_columns.next() orelse "";
+    _ = row_columns.next(); // Skip 7
+    _ = row_columns.next(); // Skip 8
+    const taxable_income = row_columns.next() orelse "";
+    const deficit = row_columns.next() orelse "";
+    const corporate_tax = row_columns.next() orelse "";
+
+    const company = Company{
+        .csv = csv,
+        .name = name,
+        .se = se,
+        .income_year = income_year,
+        .company_type = company_type,
+        .taxable_income = taxable_income,
+        .deficit = deficit,
+        .corporate_tax = corporate_tax
+    };
+
+    return company;
+}
+
 pub fn main() anyerror!void {
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
@@ -26,29 +54,7 @@ pub fn main() anyerror!void {
     var lines = std.mem.split(u8, file_data, "\n");
     _ = lines.next(); // Skip first line
     while (lines.next()) |line| {
-        var row_columns = std.mem.split(u8, line, ";");
-        const csv = row_columns.next() orelse "";
-        const name = row_columns.next() orelse "";
-        const se = row_columns.next() orelse "";
-        const income_year = row_columns.next() orelse "";
-        _ = row_columns.next(); // Skip 5
-        const company_type = row_columns.next() orelse "";
-        _ = row_columns.next(); // Skip 7
-        _ = row_columns.next(); // Skip 8
-        const taxable_income = row_columns.next() orelse "";
-        const deficit = row_columns.next() orelse "";
-        const corporate_tax = row_columns.next() orelse "";
-
-        const company = Company{
-            .csv = csv,
-            .name = name,
-            .se = se,
-            .income_year = income_year,
-            .company_type = company_type,
-            .taxable_income = taxable_income,
-            .deficit = deficit,
-            .corporate_tax = corporate_tax
-        };
+        const company = csv_line_create_company(line);
         try companies.append(company);
     }
 
