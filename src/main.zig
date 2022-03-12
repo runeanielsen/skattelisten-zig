@@ -40,12 +40,13 @@ fn csv_line_create_company(line: []const u8) Company {
 }
 
 pub fn main() anyerror!void {
+    const input_file_name = "";
+    const output_file_name = "";
+
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
     defer arena.deinit();
     const allocator = arena.allocator();
 
-    const input_file_name = "";
-    const output_file_name = "";
     const file = try std.fs.cwd().openFile(input_file_name, std.fs.File.OpenFlags{});
     defer file.close();
 
