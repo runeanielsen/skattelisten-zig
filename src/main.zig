@@ -11,7 +11,7 @@ const Company = struct {
     corporate_tax: []const u8,
 };
 
-fn csv_line_create_company(line: []const u8) Company {
+fn csvLineToCompany(line: []const u8) Company {
     var row_columns = std.mem.split(u8, line, ";");
     const csv = row_columns.next() orelse "";
     const name = row_columns.next() orelse "";
@@ -55,7 +55,7 @@ pub fn main() anyerror!void {
     var lines = std.mem.split(u8, file_data, "\n");
     _ = lines.next(); // Skip first line
     while (lines.next()) |line| {
-        const company = csv_line_create_company(line);
+        const company = csvLineToCompany(line);
         try companies.append(company);
     }
 
