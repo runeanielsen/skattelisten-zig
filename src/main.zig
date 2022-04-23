@@ -12,7 +12,7 @@ const Company = struct {
 };
 
 fn csvLineToCompany(line: []const u8) Company {
-    var row_columns = std.mem.split(u8, line, ";");
+    var row_columns = std.mem.split(u8, line, ",");
     const csv = row_columns.next() orelse "";
     const name = row_columns.next() orelse "";
     const se = row_columns.next() orelse "";
@@ -54,15 +54,15 @@ pub fn main() anyerror!void {
     const out_stream = buf_writer.writer();
 
     var buf_string: [512]u8 = undefined;
-    var fba = std.heap.FixedBufferAllocator.init(&buf_string);
-    var string = std.ArrayList(u8).init(fba.allocator());
+    var string = std.io.fixedBufferStream(&buf_string);
+    var string_writer = string.writer();
 
     _ = try in_stream.readUntilDelimiterOrEof(&buf_string, '\n'); // Skip first line
     var buf_line_reader: [512]u8 = undefined;
     while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
-        try std.json.stringify(csvLineToCompany(line), .{}, string.writer());
-        try string.append('\n');
-        _ = try out_stream.write(string.items);
-        string.clearRetainingCapacity();
+        try std.json.stringify(csvLineToCompany(line), .{}, string_writer);
+        _ = try string_writer.write("\n");
+        _ = try out_stream.write(string.getWritten());
+        string.reset();
     }
 }
