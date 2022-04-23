@@ -57,8 +57,8 @@ pub fn main() anyerror!void {
     var string = std.io.fixedBufferStream(&buf_string);
     var string_writer = string.writer();
 
-    _ = try in_stream.readUntilDelimiterOrEof(&buf_string, '\n'); // Skip first line
     var buf_line_reader: [512]u8 = undefined;
+    _ = try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n'); // Skip first line
     while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
         try std.json.stringify(csvLineToCompany(line), .{}, string_writer);
         _ = try string_writer.write("\n");
