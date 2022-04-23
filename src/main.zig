@@ -60,7 +60,6 @@ pub fn main() anyerror!void {
     _ = try in_stream.readUntilDelimiterOrEof(&buf_string, '\n'); // Skip first line
     var buf_line_reader: [512]u8 = undefined;
     while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
-        // do something with line...
         try std.json.stringify(csvLineToCompany(line), .{}, string.writer());
         try string.append('\n');
         _ = try out_stream.write(string.items);
