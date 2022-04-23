@@ -35,20 +35,18 @@ fn csvLineToCompany(line: []const u8) Company {
         .deficit = deficit,
         .corporate_tax = corporate_tax,
     };
-
-    return company;
 }
 
 pub fn main() anyerror!void {
-    const input_file_name = "";
-    const output_file_name = "";
+    const input_f_name = "";
+    const output_f_name = "";
 
-    const input_file = try std.fs.cwd().openFile(input_file_name, std.fs.File.OpenFlags{});
+    const input_file = try std.fs.cwd().openFile(input_f_name, std.fs.File.OpenFlags{});
     defer input_file.close();
     var buf_reader = std.io.bufferedReader(input_file.reader());
     var in_stream = buf_reader.reader();
 
-    const output_file = try std.fs.cwd().createFile(output_file_name, std.fs.File.CreateFlags{});
+    const output_file = try std.fs.cwd().createFile(output_f_name, std.fs.File.CreateFlags{});
     defer output_file.close();
     var buf_writer = std.io.bufferedWriter(output_file.writer());
     const out_stream = buf_writer.writer();
