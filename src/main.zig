@@ -33,7 +33,7 @@ fn csvLineToCompany(line: []const u8) Company {
         .company_type = company_type,
         .taxable_income = taxable_income,
         .deficit = deficit,
-        .corporate_tax = corporate_tax
+        .corporate_tax = corporate_tax,
     };
 
     return company;
@@ -43,24 +43,27 @@ pub fn main() anyerror!void {
     const input_file_name = "";
     const output_file_name = "";
 
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
-    const allocator = arena.allocator();
-
-    const file = try std.fs.cwd().openFile(input_file_name, std.fs.File.OpenFlags{});
-    defer file.close();
-
-    var companies = std.ArrayList(Company).init(allocator);
-    const file_data = try file.readToEndAlloc(allocator, 1048576 * 100);
-    var lines = std.mem.split(u8, file_data, "\n");
-    _ = lines.next(); // Skip first line
-    while (lines.next()) |line| {
-        const company = csvLineToCompany(line);
-        try companies.append(company);
-    }
+    const input_file = try std.fs.cwd().openFile(input_file_name, std.fs.File.OpenFlags{});
+    defer input_file.close();
+    var buf_reader = std.io.bufferedReader(input_file.reader());
+    var in_stream = buf_reader.reader();
 
     const output_file = try std.fs.cwd().createFile(output_file_name, std.fs.File.CreateFlags{});
+    defer output_file.close();
     var buf_writer = std.io.bufferedWriter(output_file.writer());
     const out_stream = buf_writer.writer();
-    try std.json.stringify(companies.items, .{}, out_stream);
+
+    var buf_string: [512]u8 = undefined;
+    var fba = std.heap.FixedBufferAllocator.init(&buf_string);
+    var string = std.ArrayList(u8).init(fba.allocator());
+
+    _ = try in_stream.readUntilDelimiterOrEof(&buf_string, '\n'); // Skip first line
+    var buf_line_reader: [512]u8 = undefined;
+    while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
+        // do something with line...
+        try std.json.stringify(csvLineToCompany(line), .{}, string.writer());
+        try string.append('\n');
+        _ = try out_stream.write(string.items);
+        string.clearRetainingCapacity();
+    }
 }
