@@ -53,16 +53,10 @@ pub fn main() anyerror!void {
     var buf_writer = std.io.bufferedWriter(output_file.writer());
     const out_stream = buf_writer.writer();
 
-    var buf_string: [512]u8 = undefined;
-    var string = std.io.fixedBufferStream(&buf_string);
-    var string_writer = string.writer();
-
     var buf_line_reader: [512]u8 = undefined;
     _ = try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n'); // Skip first line
     while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
-        try std.json.stringify(csvLineToCompany(line), .{}, string_writer);
-        _ = try string_writer.write("\n");
-        _ = try out_stream.write(string.getWritten());
-        string.reset();
+        try std.json.stringify(csvLineToCompany(line), .{}, out_stream);
+        _ = try out_stream.write("\n");
     }
 }
