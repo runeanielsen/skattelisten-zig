@@ -25,7 +25,7 @@ fn csvLineToCompany(line: []const u8) Company {
     const deficit = row_columns.next() orelse "";
     const corporate_tax = row_columns.next() orelse "";
 
-    const company = Company{
+    return Company{
         .csv = csv,
         .name = name,
         .se = se,
