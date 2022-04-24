@@ -57,4 +57,5 @@ pub fn main() anyerror!void {
         try std.json.stringify(csvLineToCompany(line), .{}, out_stream);
         _ = try out_stream.write("\n");
     }
+    try buf_writer.flush();
 }
