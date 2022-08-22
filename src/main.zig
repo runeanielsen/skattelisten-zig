@@ -44,8 +44,8 @@ fn csvLineToCompany(line: []const u8) Company {
 }
 
 pub fn main() anyerror!void {
-    const input_f_name = "/home/notation/Downloads/skatteliste-2017.csv";
-    const output_f_name = "/home/notation/test-zig.json";
+    const input_f_name = "";
+    const output_f_name = "";
 
     const input_file = try fs.openFileAbsolute(input_f_name, fs.File.OpenFlags{});
     defer input_file.close();
