@@ -3,6 +3,7 @@ const io = std.io;
 const fs = std.fs;
 const mem = std.mem;
 const json = std.json;
+const fmt = std.fmt;
 
 const Company = struct {
     csv: []const u8,
@@ -10,13 +11,14 @@ const Company = struct {
     se: []const u8,
     income_year: []const u8,
     company_type: []const u8,
-    taxable_income: []const u8,
-    deficit: []const u8,
-    corporate_tax: []const u8,
+    taxable_income: u64,
+    deficit: u64,
+    corporate_tax: u64,
 };
 
 fn csvLineToCompany(line: []const u8) Company {
     var row_columns = mem.split(u8, line, ",");
+
     const csv = row_columns.next() orelse "";
     const name = row_columns.next() orelse "";
     const se = row_columns.next() orelse "";
@@ -25,9 +27,9 @@ fn csvLineToCompany(line: []const u8) Company {
     const company_type = row_columns.next() orelse "";
     _ = row_columns.next(); // Skip 7
     _ = row_columns.next(); // Skip 8
-    const taxable_income = row_columns.next() orelse "";
-    const deficit = row_columns.next() orelse "";
-    const corporate_tax = row_columns.next() orelse "";
+    const taxable_income = fmt.parseUnsigned(u64, row_columns.next() orelse "0", 10) catch 0;
+    const deficit = fmt.parseUnsigned(u64, row_columns.next() orelse "0", 10) catch 0;
+    const corporate_tax = fmt.parseUnsigned(u64, row_columns.next() orelse "0", 10) catch 0;
 
     return Company{
         .csv = csv,
