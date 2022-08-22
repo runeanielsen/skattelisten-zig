@@ -1,4 +1,8 @@
 const std = @import("std");
+const io = std.io;
+const fs = std.fs;
+const mem = std.mem;
+const json = std.json;
 
 const Company = struct {
     csv: []const u8,
@@ -12,7 +16,7 @@ const Company = struct {
 };
 
 fn csvLineToCompany(line: []const u8) Company {
-    var row_columns = std.mem.split(u8, line, ",");
+    var row_columns = mem.split(u8, line, ",");
     const csv = row_columns.next() orelse "";
     const name = row_columns.next() orelse "";
     const se = row_columns.next() orelse "";
@@ -38,23 +42,22 @@ fn csvLineToCompany(line: []const u8) Company {
 }
 
 pub fn main() anyerror!void {
-    const input_f_name = "";
-    const output_f_name = "";
+    const input_f_name = "/home/notation/Downloads/skatteliste-2017.csv";
+    const output_f_name = "/home/notation/test-zig.json";
 
-    const input_file = try std.fs.cwd().openFile(input_f_name, std.fs.File.OpenFlags{});
+    const input_file = try fs.openFileAbsolute(input_f_name, fs.File.OpenFlags{});
     defer input_file.close();
-    var buf_reader = std.io.bufferedReader(input_file.reader());
-    var in_stream = buf_reader.reader();
+    const in_stream = io.bufferedReader(input_file.reader()).reader();
 
-    const output_file = try std.fs.cwd().createFile(output_f_name, std.fs.File.CreateFlags{});
+    const output_file = try fs.createFileAbsolute(output_f_name, fs.File.CreateFlags{});
     defer output_file.close();
-    var buf_writer = std.io.bufferedWriter(output_file.writer());
+    var buf_writer = io.bufferedWriter(output_file.writer());
     const out_stream = buf_writer.writer();
 
     var buf_line_reader: [512]u8 = undefined;
-    _ = try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n'); // Skip first line
+    _ = try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n'); // Skip CSV header.
     while (try in_stream.readUntilDelimiterOrEof(&buf_line_reader, '\n')) |line| {
-        try std.json.stringify(csvLineToCompany(line), .{}, out_stream);
+        try json.stringify(csvLineToCompany(line), .{}, out_stream);
         _ = try out_stream.write("\n");
     }
     try buf_writer.flush();
